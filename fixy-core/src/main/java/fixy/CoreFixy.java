@@ -84,6 +84,7 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
 
     @Override
     protected Class<?> getClassForName(String name) throws ClassNotFoundException {
+        System.out.println("CoreFixy#getClassForName, name=" + name);
         if(!Strings.isNullOrEmpty(packageName)) {
             try {
                 return super.getClassForName(packageName + "." + name);
@@ -103,6 +104,7 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
 
     @Override
     protected Object createInstance(ScalarNode node, CompactData data) throws Exception {
+        System.out.println("CoreFixy#createInstance, node=" + node.getValue() + ", data=" + data.toString());
         if(!entityCache.containsKey(node.getValue())) {
             data.getArguments().clear();
             Object entity = super.createInstance(node, data);
@@ -136,6 +138,7 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
                     postProcessor.process(entity);
                 }
             }
+            System.out.println("CoreFixy#persistEntities, entity=" + entity.getClass().toString());
             persister.persist(entity);
         }
     }
