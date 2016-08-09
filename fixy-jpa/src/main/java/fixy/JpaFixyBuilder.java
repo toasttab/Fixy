@@ -15,6 +15,7 @@ public class JpaFixyBuilder {
     private boolean mergeEntities;
     private String defaultPackage;
     private BeanAccess beanAccess = BeanAccess.DEFAULT;
+    private ClassLoader classLoader;
 
     /**
      * Creates the builder with a given JPA EntityManager.
@@ -58,15 +59,26 @@ public class JpaFixyBuilder {
     }
 
     /**
+     * Enables use of a custom class loader.
+     *
+     * @return the JpaFixyBuilder for further configuration
+     */
+    public JpaFixyBuilder withCustomClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+        return this;
+    }
+
+    /**
      * Builds the Fixy using the provided builder configuration.
      *
      * @return the configured Fixy
      */
     public Fixy build() {
         return new CoreFixy(
-            new JPAPersister(entityManager, mergeEntities),
-            defaultPackage,
-            beanAccess);
+                new JPAPersister(entityManager, mergeEntities),
+                defaultPackage,
+                beanAccess,
+                classLoader);
     }
 
 }

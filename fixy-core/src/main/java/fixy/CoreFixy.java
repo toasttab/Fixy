@@ -64,6 +64,7 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
     private final String defaultPackage;
     private final BeanAccess beanAccess;
     private String packageName;
+    private ClassLoader classLoader;
 
     public CoreFixy(Persister persister) {
         this(persister, "");
@@ -74,17 +75,25 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
     }
 
     public CoreFixy(Persister persister, String defaultPackage, BeanAccess beanAccess) {
+        this(persister, defaultPackage, beanAccess, null);
+    }
+
+    public CoreFixy(Persister persister, String defaultPackage, BeanAccess beanAccess, ClassLoader classLoader) {
         this.yamlConstructors.put(new Tag("!import"), new ConstructImport(this));
         this.yamlConstructors.put(new Tag("!package"), new ConstructPackage(this));
         this.defaultPackage = defaultPackage;
         this.packageName = defaultPackage;
         this.persister = persister;
         this.beanAccess = beanAccess;
+        this.classLoader = classLoader;
     }
 
     @Override
     protected Class<?> getClassForName(String name) throws ClassNotFoundException {
         System.out.println("CoreFixy#getClassForName, name=" + name);
+        try {
+            return getClassForNameWithCustomClassLoader(name);
+        } catch (ClassNotFoundException ignored) { }
         if(!Strings.isNullOrEmpty(packageName)) {
             try {
                 return super.getClassForName(packageName + "." + name);
@@ -98,6 +107,24 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
         }
         try {
             return super.getClassForName("java.lang." + name);
+        } catch (ClassNotFoundException ignored) { }
+        throw exceptionToThrow;
+    }
+
+    private Class<?> getClassForNameWithCustomClassLoader(String name) throws ClassNotFoundException {
+        if (!Strings.isNullOrEmpty(packageName)) {
+            try {
+                return Class.forName(packageName + "." + name, true, classLoader);
+            } catch (ClassNotFoundException ignored) { }
+        }
+        ClassNotFoundException exceptionToThrow;
+        try {
+            return Class.forName(name, true, classLoader);
+        } catch (ClassNotFoundException e) {
+            exceptionToThrow = e;
+        }
+        try {
+            return Class.forName("java.lang." + name, true, classLoader);
         } catch (ClassNotFoundException ignored) { }
         throw exceptionToThrow;
     }
