@@ -91,15 +91,10 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
     @Override
     protected Class<?> getClassForName(String name) throws ClassNotFoundException {
         System.out.println("CoreFixy#getClassForName, name=" + name);
+        try {
+            return getClassForNameWithCustomClassLoader(name);
+        } catch (ClassNotFoundException ignored) { }
         if(!Strings.isNullOrEmpty(packageName)) {
-            if (classLoader != null) {
-                try {
-                    return Class.forName(packageName + "." + name, true, classLoader);
-                } catch (ClassNotFoundException ignored) { }
-                try {
-                    return Class.forName(name, true, classLoader);
-                } catch (ClassNotFoundException ignored) { }
-            }
             try {
                 return super.getClassForName(packageName + "." + name);
             } catch (ClassNotFoundException ignored) { }
@@ -112,6 +107,24 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
         }
         try {
             return super.getClassForName("java.lang." + name);
+        } catch (ClassNotFoundException ignored) { }
+        throw exceptionToThrow;
+    }
+
+    private Class<?> getClassForNameWithCustomClassLoader(String name) throws ClassNotFoundException {
+        if (!Strings.isNullOrEmpty(packageName)) {
+            try {
+                return Class.forName(packageName + "." + name, true, classLoader);
+            } catch (ClassNotFoundException ignored) { }
+        }
+        ClassNotFoundException exceptionToThrow;
+        try {
+            return Class.forName(name, true, classLoader);
+        } catch (ClassNotFoundException e) {
+            exceptionToThrow = e;
+        }
+        try {
+            return Class.forName("java.lang." + name, true, classLoader);
         } catch (ClassNotFoundException ignored) { }
         throw exceptionToThrow;
     }
