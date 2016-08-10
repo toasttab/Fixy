@@ -16,6 +16,7 @@ public class JpaFixyBuilder {
     private String defaultPackage;
     private BeanAccess beanAccess = BeanAccess.DEFAULT;
     private ClassLoader classLoader;
+    private String yamlPathRoot;
 
     /**
      * Creates the builder with a given JPA EntityManager.
@@ -68,6 +69,11 @@ public class JpaFixyBuilder {
         return this;
     }
 
+    public JpaFixyBuilder withYamlPathRoot(String root) {
+        this.yamlPathRoot = root;
+        return this;
+    }
+
     /**
      * Builds the Fixy using the provided builder configuration.
      *
@@ -78,7 +84,8 @@ public class JpaFixyBuilder {
                 new JPAPersister(entityManager, mergeEntities),
                 defaultPackage,
                 beanAccess,
-                classLoader);
+                classLoader,
+                yamlPathRoot);
     }
 
 }

@@ -66,6 +66,7 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
     private final BeanAccess beanAccess;
     private String packageName;
     private ClassLoader classLoader;
+    private String yamlPathRoot;
 
     public CoreFixy(Persister persister) {
         this(persister, "");
@@ -76,10 +77,10 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
     }
 
     public CoreFixy(Persister persister, String defaultPackage, BeanAccess beanAccess) {
-        this(persister, defaultPackage, beanAccess, null);
+        this(persister, defaultPackage, beanAccess, null, null);
     }
 
-    public CoreFixy(Persister persister, String defaultPackage, BeanAccess beanAccess, ClassLoader classLoader) {
+    public CoreFixy(Persister persister, String defaultPackage, BeanAccess beanAccess, ClassLoader classLoader, String yamlPathRoot) {
         this.yamlConstructors.put(new Tag("!import"), new ConstructImport(this));
         this.yamlConstructors.put(new Tag("!package"), new ConstructPackage(this));
         this.defaultPackage = defaultPackage;
@@ -87,6 +88,7 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
         this.persister = persister;
         this.beanAccess = beanAccess;
         this.classLoader = classLoader;
+        this.yamlPathRoot = yamlPathRoot;
     }
 
     @Override
@@ -148,6 +150,11 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
             if(!file.startsWith("/")) {
                 file = "/" + file;
             }
+
+            if (yamlPathRoot != null) {
+                file = yamlPathRoot + file;
+            }
+
             String origPackage = this.packageName;
             this.packageName = this.defaultPackage;
 
