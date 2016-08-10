@@ -5,9 +5,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
-
 import org.yaml.snakeyaml.extensions.compactnotation.CompactConstructor;
 import org.yaml.snakeyaml.extensions.compactnotation.CompactData;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -15,6 +15,7 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
 
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -149,7 +150,21 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
             }
             String origPackage = this.packageName;
             this.packageName = this.defaultPackage;
-            yaml.load(getClass().getResourceAsStream(file));
+
+            InputStream is = null;
+            if (classLoader != null) {
+                try {
+                    is = classLoader.getResourceAsStream(file);
+                } catch (Exception e) {
+                    System.out.println("Failed to read file from custom classloader " + e.getMessage());
+                }
+            }
+
+            if (is == null) {
+                is = getClass().getResourceAsStream(file);
+            }
+
+            yaml.load(is);
             this.packageName = origPackage;
         }
     }
