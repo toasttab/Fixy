@@ -93,7 +93,7 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
 
     @Override
     protected Class<?> getClassForName(String name) throws ClassNotFoundException {
-        System.out.println("CoreFixy#getClassForName, name=" + name);
+//        System.out.println("CoreFixy#getClassForName, name=" + name);
         try {
             return getClassForNameWithCustomClassLoader(name);
         } catch (ClassNotFoundException ignored) { }
@@ -134,7 +134,7 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
 
     @Override
     protected Object createInstance(ScalarNode node, CompactData data) throws Exception {
-        System.out.println("CoreFixy#createInstance, node=" + node.getValue() + ", data=" + data.toString());
+//        System.out.println("CoreFixy#createInstance, node=" + node.getValue() + ", data=" + data.toString());
         if(!entityCache.containsKey(node.getValue())) {
             data.getArguments().clear();
             Object entity = super.createInstance(node, data);
@@ -155,6 +155,7 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
                 file = yamlPathRoot + file;
             }
 
+            System.out.println("Deserializing YML file: " + file + " ...........");
             String origPackage = this.packageName;
             this.packageName = this.defaultPackage;
 
@@ -177,6 +178,7 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
     }
 
     void persistEntities() {
+        System.out.println("Persisting entities...........");
         Queue<Object> processQueue = new LinkedList<Object>(entityCache.values());
         while(!processQueue.isEmpty()) {
             Object entity = processQueue.remove();
@@ -187,7 +189,7 @@ public final class CoreFixy extends CompactConstructor implements Fixy {
                     postProcessor.process(entity);
                 }
             }
-            System.out.println("CoreFixy#persistEntities, entity=" + entity.getClass().toString());
+//            System.out.println("CoreFixy#persistEntities, entity=" + entity.getClass().toString());
             persister.persist(entity);
         }
     }
