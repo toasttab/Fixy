@@ -9,7 +9,7 @@ subprojects {
     apply plugin: 'maven'
 
     group = 'com.toasttab.fixy'
-    version = 2.7
+    version = 2.8-SNAPSHOT
 
     sourceCompatibility = 1.7
 
